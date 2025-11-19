@@ -17,7 +17,23 @@ A universal Python client for the [screenshare.lol](https://screenshare.lol) API
 ## 📦 Installation
 
 ```bash
-pip install sslol-api
+1. Clone the repository
+git clone https://github.com/teqeu/screensharepy.git
+cd screensharepy
+```
+
+```bash
+2. Install dependencies
+
+pip install -r requirements.txt
+
+```
+```bash
+3. Install the package locally
+
+If you want to use it anywhere in Python while working in the project:
+
+pip install -e .
 ```
 
 **Requirements:**
@@ -61,7 +77,7 @@ response = SearchResponse(**raw_data)
 
 print("Discord ID:", response.user.discord_id)
 print("Total guild records:", response.summary.total_guild_records)
-print("Flagged:", response.flagged)
+print("Flagged:", response.flagged) # returns null (TODO)
 ```
 
 ### Asynchronous
@@ -88,13 +104,13 @@ asyncio.run(main())
 ## 🖥️ CLI Usage
 
 ```bash
-python -m sslol_api.cli 707967805026467851 --async_mode
+python -m sslol_api.cli discord_id --async_mode
 ```
 
 With API key:
 
 ```bash
-python -m sslol_api.cli 707967805026467851 --async_mode --api_key YOUR_API_KEY
+python -m sslol_api.cli discord_id --async_mode
 ```
 
 ---
@@ -118,43 +134,14 @@ async def check_user(ctx, discord_id: str):
     await ctx.respond(
         f"Discord ID: {response.user.discord_id}\n"
         f"Total guild records: {response.summary.total_guild_records}\n"
-        f"Flagged: {response.flagged}"
+        f"Flagged: {response.flagged}" # TODO (line no. 80)
     )
 
-bot.run("YOUR_DISCORD_BOT_TOKEN")
+bot.run("discordtoken")
 ```
 
 ---
 
-## 🌐 FastAPI Integration
-
-```python
-from fastapi import FastAPI
-from sslol_api.client import SSLolClient
-from sslol_api.models import SearchResponse
-
-app = FastAPI()
-client = SSLolClient()
-
-@app.get("/user/{discord_id}")
-async def get_user(discord_id: str):
-    raw_data = await client.get_user_async(discord_id)
-    response = SearchResponse(**raw_data)
-    return response.dict()
-```
-
----
-
-## 📊 Pydantic Models
-
-- `SearchResponse` — Full response object  
-- `UserInfo` — Discord user info  
-- `GuildJoinLeave` — Guild join/leave records  
-- `Summary` — Ticket and guild record summary  
-
-All fields are typed and validated.
-
----
 
 ## ❗ Error Handling
 
