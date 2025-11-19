@@ -1,145 +1,187 @@
-# ssLOL API Client
-A **universal Python client** for the [screenshare.lol (ssLOL) API](https://screenshare.lol), designed to work in **Discord bots, web apps, scripts, CLI tools, and other Python applications**. Supports **synchronous and asynchronous requests** with **typed responses** using Pydantic.  
-## **Installation**
-### Using `pip`
+# ssLOL API Client – `screensharepy`
+
+A universal Python client for the [screenshare.lol](https://screenshare.lol) API, designed to work seamlessly across Discord bots, web apps, scripts, and CLI tools. Supports both synchronous and asynchronous requests with typed Pydantic models and a modular, extensible architecture.
+
+---
+
+## 🚀 Features
+
+- ✅ Sync + Async support  
+- 🧩 Modular design with typed Pydantic models  
+- 🔐 Flexible API key handling (env or direct)  
+- 🛠️ CLI tool for quick lookups  
+- 🤖 Discord bot & FastAPI integration examples  
+
+---
+
+## 📦 Installation
+
 ```bash
 pip install sslol-api
-Requirements
-Python 3.8+
+```
 
-Dependencies installed automatically: requests, httpx, pydantic
+**Requirements:**
+- Python 3.8+
+- Dependencies: `requests`, `httpx`, `pydantic` (installed automatically)
 
-Setup
-1. API Key
-Set your ssLOL API key in an environment variable:
-Windows (PowerShell):
+---
 
-powershell
-Copy code
+## 🔑 Setup
+
+### Option 1: Environment Variable
+
+```bash
+# Windows (PowerShell)
 $env:SSLOL_API_KEY="YOUR_API_KEY"
-Linux/macOS (bash/zsh):
 
-bash
-Copy code
+# Linux/macOS
 export SSLOL_API_KEY="YOUR_API_KEY"
-You can also pass the API key directly to the client:
+```
 
-python
-Copy code
+### Option 2: Pass API Key Directly
+
+```python
 from sslol_api.client import SSLolClient
 client = SSLolClient(api_key="YOUR_API_KEY")
-Basic Usage
-Synchronous
-python
-Copy code
+```
+
+---
+
+## 🧪 Basic Usage
+
+### Synchronous
+
+```python
 from sslol_api.client import SSLolClient
 from sslol_api.models import SearchResponse
+
 client = SSLolClient()
 raw_data = client.get_user("707967805026467851")
 response = SearchResponse(**raw_data)
+
 print("Discord ID:", response.user.discord_id)
 print("Total guild records:", response.summary.total_guild_records)
 print("Flagged:", response.flagged)
-Asynchronous
-python
-Copy code
+```
+
+### Asynchronous
+
+```python
 import asyncio
 from sslol_api.client import SSLolClient
 from sslol_api.models import SearchResponse
+
 client = SSLolClient()
+
 async def main():
     raw_data = await client.get_user_async("707967805026467851")
     response = SearchResponse(**raw_data)
     print("Discord ID:", response.user.discord_id)
     print("Total guild records:", response.summary.total_guild_records)
     print("Flagged:", response.flagged)
-asyncio.run(main())
-CLI Usage
-bash
-Copy code
-python -m sslol_api.cli 707967805026467851 --async_mode
-Optional: pass API key directly
 
-bash
-Copy code
+asyncio.run(main())
+```
+
+---
+
+## 🖥️ CLI Usage
+
+```bash
+python -m sslol_api.cli 707967805026467851 --async_mode
+```
+
+With API key:
+
+```bash
 python -m sslol_api.cli 707967805026467851 --async_mode --api_key YOUR_API_KEY
-Integration Examples
-Discord Bot (discord.py)
-python
-Copy code
+```
+
+---
+
+## 🤖 Discord Bot Integration (discord.py)
+
+```python
 import discord
 from sslol_api.client import SSLolClient
 from sslol_api.models import SearchResponse
+
 client = SSLolClient()
 intents = discord.Intents.default()
 intents.members = True
 bot = discord.Bot(intents=intents)
+
 @bot.slash_command(description="Check ssLOL user data")
 async def check_user(ctx, discord_id: str):
     raw_data = await client.get_user_async(discord_id)
     response = SearchResponse(**raw_data)
-    await ctx.respond(f"Discord ID: {response.user.discord_id}\nTotal guild records: {response.summary.total_guild_records}\nFlagged: {response.flagged}")
+    await ctx.respond(
+        f"Discord ID: {response.user.discord_id}\n"
+        f"Total guild records: {response.summary.total_guild_records}\n"
+        f"Flagged: {response.flagged}"
+    )
+
 bot.run("YOUR_DISCORD_BOT_TOKEN")
-FastAPI Web Application
-python
-Copy code
+```
+
+---
+
+## 🌐 FastAPI Integration
+
+```python
 from fastapi import FastAPI
 from sslol_api.client import SSLolClient
 from sslol_api.models import SearchResponse
+
 app = FastAPI()
 client = SSLolClient()
+
 @app.get("/user/{discord_id}")
 async def get_user(discord_id: str):
     raw_data = await client.get_user_async(discord_id)
     response = SearchResponse(**raw_data)
     return response.dict()
-Python Script / Analytics
-python
-Copy code
-from sslol_api.client import SSLolClient
-from sslol_api.models import SearchResponse
-client = SSLolClient()
-discord_ids = ["707967805026467851", "123456789012345678"]
-for user_id in discord_ids:
-    raw_data = client.get_user(user_id)
-    user = SearchResponse(**raw_data)
-    print(f"{user.user.discord_id} joined {len(user.guild_join_leave)} guilds")
-Pydantic Models
-SearchResponse — Full response object
+```
 
-UserInfo — Discord user info
+---
 
-GuildJoinLeave — Guild join/leave records
+## 📊 Pydantic Models
 
-Summary — Tickets and guild record summary
-All fields are typed and validated. Example:
+- `SearchResponse` — Full response object  
+- `UserInfo` — Discord user info  
+- `GuildJoinLeave` — Guild join/leave records  
+- `Summary` — Ticket and guild record summary  
 
-python
-Copy code
-print(response.user.discord_id)
-print(response.summary.total_guild_records)
-print(response.flagged)
-Error Handling
-All exceptions inherit from SSLolAPIError:
+All fields are typed and validated.
 
-python
-Copy code
+---
+
+## ❗ Error Handling
+
+```python
 from sslol_api.client import SSLolClient
 from sslol_api.exceptions import SSLolAPIError
+
 client = SSLolClient()
+
 try:
     raw_data = client.get_user("707967805026467851")
 except SSLolAPIError as e:
     print("API Error:", e)
-SSLolConnectionError → network issues
+```
 
-SSLolResponseError → invalid JSON responses
+- `SSLolConnectionError` → Network issues  
+- `SSLolResponseError` → Invalid JSON responses  
 
-Advanced Features
-Sync + Async support — works in bots, web apps, scripts
+---
 
-CLI tool — can fetch user data from terminal
+## 📚 License
 
-Flexible API key — environment variable or direct argument
+MIT License © [teqeu](https://github.com/teqeu)
 
-Validator-friendly — all fields are typed, including flagged (True/False/None)
+---
+
+## 🌐 Links
+
+- [screenshare.lol](https://screenshare.lol)  
+- [GitHub Repo](https://github.com/teqeu/screensharepy)
